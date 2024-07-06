@@ -7,7 +7,7 @@ Your commit messages' prefixes.
 You keep forgetting what prefix to use for what commit?
 > `Feat`, `Add`? What should I use? Can I even use `New`??
 
-Does that sound like you? Not anymore!
+Does that sound like you sometimes? Not anymore!
 This python script keeps a list of all your commit messages' prefixes. You can see all of
 them or search for one. The top search result is automatically copied. 😊
 
