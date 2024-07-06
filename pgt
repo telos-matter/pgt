@@ -1,0 +1,490 @@
+#!/usr/bin/env python 
+
+# You keep forgetting what prefix to use for what commit? Not anymore!
+
+# https://github.com/telos-matter/pgt
+# 2024_06, HEMMOUDA Aymane
+
+
+# Want to add, remove, or edit a prefix? See the list after this class definition
+
+
+import argparse
+from os import linesep as NL
+
+class Prefix ():
+    def __init__(self, prefix: str, description: str, use_cases: list[str], *keywords: str) -> None:
+        '''
+        - prefix: the prefix it self. For example `feat` or `add`..
+        - description: a short description of when it's used
+        - use_cases: a list of all the uses cases of this prefix
+        - keywords: keywords that mark this prefix and its use
+        cases. What the search will happen against. Unique single
+        words'''
+        self.prefix = prefix
+        self.description = description
+        self.use_cases = use_cases
+        self.keywords = list(keywords) # The keywords are just as good as the prefix it self if you think about it
+        self.keywords.insert(0, prefix)
+    
+    @classmethod
+    def format_prefix (cls, prefix: str) -> str:
+        '''When ever the prefix is shown
+        or when its copied, show it in this
+        format.
+        It's useful for me because
+        I like my prefixes to be
+        in UPPERCASE. Maybe other
+        people like them some other way'''
+        return prefix.upper()
+    
+    def simple_repr (self) -> str:
+        '''A simple representation of this prefix'''
+        return f"{Prefix.format_prefix(self.prefix)}: {self.description}"
+    
+    def detailed_repr (self) -> str:
+        '''A detailed representation of this prefix'''
+        repr = f"{Prefix.format_prefix(self.prefix)}: {self.description}{NL}"
+        repr += NL.join([f"\t-> {use_case}" for use_case in self.use_cases])
+        return repr
+
+# The list of known prefixes. The Prefix class is treated
+# like an Enum, and these are its instances.
+# Edit as you like, but keep the keywords unique across all prefixes.
+PREFIXES = [
+    Prefix('feat', 'for new features', [
+        'Implementing a new feature',
+        'Adding a new capability or functionality',
+        'Launching a new module',
+        'Introducing a new service',
+        'Deploying a new application feature',
+        'Creating a new user interface element'
+    ], 'feature', 'new', 'addition', 'capability',
+    'innovation', 'launch', 'introduction', 'invention',
+    'implementation'),
+
+    Prefix('fix', 'for bug fixes', [
+        'Fixing a software bug',
+        'Resolving an error or issue',
+        'Correcting a malfunction',
+        'Addressing a defect',
+        'Debugging and repairing code',
+        'Patching a known issue'
+    ], 'repair', 'resolve', 'correct', 'debug',
+    'error', 'adjustment'),
+
+    Prefix('modify', 'for structure / code update', [
+        'Updating code without adding new features or fixing bugs',
+        'Structural changes to code',
+        'Refactoring code layout',
+        'Enhancing code organization',
+        'Adjusting code for better maintainability',
+        'Revising code for consistency'
+    ], 'update', 'change', 'edit', 'alter',
+    'revise', 'transform', 'shift', 'amend',
+    'tweak'),
+
+    Prefix('refactor', 'for code refactoring', [
+        'Restructuring existing code',
+        'Improving code readability',
+        'Changing code without altering functionality',
+        'Optimizing code structure',
+        'Cleaning up technical debt',
+        'Modularizing code for reuse'
+    ], 'reorganize', 'restructure', 'organize', 'simplify',
+    'modularize'),
+
+    Prefix('docs', 'for documentation changes', [
+        'Updating or adding documentation',
+        'Correcting typos or errors in documentation',
+        'Enhancing documentation clarity',
+        'Adding usage examples',
+        'Revising API documentation',
+        'Creating new guides or tutorials'
+    ], 'documentation', 'readme', 'guide', 'manual',
+    'notes', 'instructions', 'comments', 'annotation',
+    'reference', 'text'),
+
+    Prefix('improve', 'for code improvements', [
+        'Enhancing existing features',
+        'Improving code quality',
+        'Adding better error messages',
+        'Upgrading algorithms',
+        'Refining user experience',
+        'Strengthening application stability'
+    ], 'enhance', 'upgrade', 'refine', 'boost',
+    'augment', 'polish', 'strengthen', 'advance'),
+
+    Prefix('optimize', 'for performance optimizations', [
+        'Improving application performance',
+        'Reducing memory usage',
+        'Enhancing processing speed',
+        'Optimizing database queries',
+        'Streamlining code execution',
+        'Minimizing load times'
+    ], 'speed', 'efficient', 'accelerate', 'streamline',
+    'load', 'minimize'),
+
+    Prefix('add', 'for adding new files or components', [
+        'Adding new files',
+        'Introducing new components or modules',
+        'Including new assets',
+        'Integrating new libraries',
+        'Incorporating new services',
+        'Appending new resources'
+    ], 'include', 'insert', 'introduce', 'integrate',
+    'append', 'attach', 'embed', 'incorporate'),
+
+    Prefix('remove', 'for removing files or deprecated features', [
+        'Deleting files',
+        'Removing deprecated features',
+        'Cleaning up obsolete code',
+        'Uninstalling unused libraries',
+        'Purging redundant data',
+        'Discarding unnecessary components'
+    ], 'eliminate', 'discard', 'erase', 'purge',
+    'withdraw', 'uninstall', 'strip'),
+
+    Prefix('style', 'for code style changes', [
+        'Formatting code',
+        'Adjusting code style',
+        'Correcting code style issues',
+        'Applying consistent indentation',
+        'Aligning code blocks',
+        'Beautifying code'
+    ], 'format', 'beautify', 'indent', 'align',
+    'arrange', 'layout'),
+
+    Prefix('chore', 'for routine tasks, maintenance, or miscellaneous changes', [
+        'Routine maintenance tasks',
+        'Non-functional changes',
+        'Build process changes',
+        'Updating scripts',
+        'Managing dependencies',
+        'Performing administrative tasks'
+    ], 'routine', 'task', 'miscellaneous', 'manage',
+    'housekeeping', 'admin', 'upkeep'),
+
+    Prefix('update', 'for updating dependencies or other updates', [
+        'Updating dependencies',
+        'General software updates',
+        'Upgrading packages',
+        'Synchronizing libraries',
+        'Modernizing codebase',
+        'Refreshing application components'
+    ], 'refresh', 'renew', 'sync', 'modernize'),
+
+    Prefix('config', 'for configuration changes', [
+        'Changing configuration files',
+        'Updating settings',
+        'Modifying configuration parameters',
+        'Adjusting environment variables',
+        'Customizing application setup',
+        'Managing configuration profiles'
+    ], 'setup', 'adjust', 'parameter', 'setting',
+    'environment', 'options', 'preferences', 'customize'),
+
+    Prefix('dependencies', 'for updates to dependencies', [
+        'Updating library dependencies',
+        'Managing dependency versions',
+        'Installing new packages',
+        'Upgrading third-party modules',
+        'Resolving dependency conflicts',
+        'Maintaining dependency health'
+    ], 'depend', 'library', 'lib', 'module', 'version', 'requirement'),
+
+    Prefix('hotfix', 'for urgent fixes that need to be deployed quickly', [
+        'Urgent bug fixes',
+        'Critical issue resolution',
+        'Immediate patch deployment',
+        'Emergency software repairs',
+        'Rapid error correction',
+        'Swift problem-solving'
+    ], 'hot', 'urgent', 'emergency', 'quick', 'immediate',
+    'critical', 'rapid', 'swift', 'instant'),
+
+    Prefix('merge', 'for merge commits', [
+        'Merging branches',
+        'Integrating changes from one branch to another',
+        'Resolving merge conflicts',
+        'Combining development efforts',
+        'Syncing feature branches',
+        'Finalizing pull requests'
+    ], 'combine', 'blend', 'unite', 'join',
+    'consolidate', 'fuse', 'mix', 'sync', 'unify'),
+
+    Prefix('revert', 'for reverting a previous commit', [
+        'Undoing a previous commit',
+        'Rolling back changes',
+        'Restoring previous state',
+        'Cancelling erroneous changes',
+        'Reversing recent modifications',
+        'Withdrawing incorrect updates'
+    ], 'undo', 'rollback', 'cancel', 'restore',
+    'repeal', 'recall', 'backtrack', 'return'),
+
+    Prefix('security', 'for security-related changes', [
+        'Addressing security vulnerabilities',
+        'Implementing security enhancements',
+        'Patching security flaws',
+        'Strengthening application security',
+        'Guarding against threats',
+        'Securing sensitive data'
+    ], 'safe', 'protect', 'guard', 'shield',
+    'encrypt', 'defend', 'safeguard', 'harden'),
+
+    Prefix('bug', 'similar to fix, used for bug fixes', [
+        'Fixing software bugs',
+        'Resolving defects',
+        'Correcting issues',
+        'Debugging problems',
+        'Repairing errors',
+        'Patching vulnerabilities'
+    ], 'bug', 'issue', 'defect'),
+
+    Prefix('clean', 'for when you clean the code after a commit', [
+        'Cleaning up code',
+        'Removing unused code',
+        'Tidying up after a commit',
+        'Organizing codebase',
+        'Simplifying code structure',
+        'Clearing redundant code'
+    ], 'purge', 'neaten', 'sanitize', 'streamline'),
+
+    Prefix('test', 'for adding or modifying tests', [
+        'Adding new tests',
+        'Updating existing tests',
+        'Fixing test issues',
+        'Creating unit tests',
+        'Writing integration tests',
+        'Ensuring code quality through testing'
+    ], 'validate', 'verify', 'check', 'assess', 'examine'
+    'trial', 'evaluate', 'inspect', 'measure', 'qa')
+]
+
+
+class PrefixScore ():
+    '''The dissimilarity score between a term and a Prefix.
+    The lower the closer they are.\n
+    Ranges from 0 to +inf, with 0 being
+    that that term describes the prefix perfectly, and anything
+    equal to or greater than the length of the term could
+    be dismissed.\n
+    Uses Levenshtein distance.'''
+    
+    @classmethod
+    def __calculate_dissimilarity (cls, term: str, prefix: Prefix) -> int:
+        '''The backbone method'''
+        
+        # The way it works is that
+        # it returns the lowest score it can
+        # find across the prefix and its keywords.
+        # Because if you think about it, when
+        # searching for a term, having a 0
+        # score on a keyword is just as good
+        # as having a 0 score on the prefix it
+        # self. Especially knowing that the keywords
+        # are unique.
+        
+        def lev (a: str, b: str) -> int:
+            '''Levenshtein distance'''
+            # If any are empty, the the lev distance is the entire other string
+            if not a:
+                return len(b)
+            if not b:
+                return len(a)
+            
+            len_a = len(a) + 1 # The length is used in the range function
+            len_b = len(b) + 1 # and the end needs to be inclusive
+            
+            # Construct the table
+            table = []
+            for i in range(len_a):
+                if i == 0:
+                    table.append(list(range(len_b)))
+                else:
+                    row = [-1] * (len_b)
+                    row[0] = i
+                    table.append(row)
+            
+            # Compute
+            for i in range(1, len_a):
+                a_head = a[-i]
+                for j in range(1, len_b):
+                    # If heads are equal
+                    if a_head == b[-j]:
+                        table[i][j] = table[i -1][j -1]
+                    # Otherwise 1 +minimum of del, add, or sub
+                    else:
+                        table[i][j] = 1 + min(table[i -1][j], table[i][j -1], table[i -1][j -1])
+            
+            # Result in bottom right corner
+            return table[len(a)][len(b)]
+        
+        lowest_score = None
+        for keyword in prefix.keywords:
+            score = lev(term, keyword)
+            if score == 0:
+                return score
+            
+            if lowest_score is None:
+                lowest_score = score
+            elif score < lowest_score:
+                lowest_score = score
+        
+        return lowest_score
+    
+    def __init__(self, term: str, prefix: Prefix) -> None:
+        '''- term: the search term
+        - prefix: the Prefix'''
+        self.term = term
+        self.prefix = prefix
+        self.score = PrefixScore.__calculate_dissimilarity(term, prefix)
+    
+    @classmethod
+    def pick_unique(cls, prefixes_scores: list['PrefixScore']) -> list['PrefixScore']:
+        '''Make a list of unique Prefixes.\n
+        If two `PrefixScore`s have the same
+        `Prefix`, regardless of the `term`, then
+        only the one with the lowest score
+        is kept.'''
+        
+        uniques: list[PrefixScore] = []
+        for prefix_score in prefixes_scores:
+            # Check if the Prefix of this PrefixScore exits
+            exists = False
+            for i in range(len(uniques)):
+                if prefix_score.prefix is uniques[i].prefix:
+                    # If it does exist, update to keep the one with the lowest score
+                    exists = True
+                    if prefix_score.score < uniques[i].score:
+                        uniques[i] = prefix_score
+                    break
+            # If it does not exists, then add it
+            if not exists:
+                uniques.append(prefix_score)
+        
+        return uniques
+    
+    @classmethod
+    def intersection (cls, list_a: list['PrefixScore'], list_b: list['PrefixScore']) -> list['PrefixScore']:
+        '''Returns the intersection of the two lists based
+        on the prefix. The term does not matter.\n
+        The `PrefixScore`s with the lowest score
+        is picked.\n
+        The two lists are assumed to not have duplicates'''
+        # If the second list is empty
+        if not list_b:
+            return []
+        
+        result = []
+        for a in list_a:
+            for b in list_b:
+                if a.prefix is b.prefix:
+                    if a.score < b.score:
+                        result.append(a)
+                    else:
+                        result.append(b)
+                    break
+        
+        return result
+
+
+def copy (s: str) -> bool:
+    '''Copy the given string to the clipboard.\n
+    Returns `True` if copied, `False` if unable to.'''
+    try:
+        import pyperclip # type: ignore
+        pyperclip.copy(s)
+        return True
+    except:
+        return False
+
+
+# With the needed "boilerplate" out of the way, let's get started
+
+ARG_PARSER = argparse.ArgumentParser(
+    prog='pgt',
+    description=f"""You keep forgetting what prefix to use for what commit? Not anymore!
+    This script keeps a list of all your commit messages' prefixes. You can see all of them
+    or search for one. The
+    top search result is automatically copied. 😊""",
+    epilog='https://github.com/telos-matter/pgt'
+)
+
+ARG_PARSER.add_argument('-a', '--all', action='store_true', help='search for prefixes that contain ALL of the search terms, rather than ANY of the search terms')
+ARG_PARSER.add_argument('-n', '--no-copy', action='store_true', help='do NOT copy the top result prefix')
+ARG_PARSER.add_argument('terms', type=str, nargs='*', help='the terms to search with for a prefix')
+
+ARGS = ARG_PARSER.parse_args()
+if ARGS.all and len(ARGS.terms) == 1: # If there is only 1 term, `all` is same as `any`
+    ARGS.all = False
+
+
+# User wants to see all the prefixes
+if len(ARGS.terms) == 0:
+    for prefix in PREFIXES:
+        print(f"- {prefix.simple_repr()}")
+    exit(0)
+
+
+# User is searching
+terms_results: dict[str, list[PrefixScore]] = {} # A dict that maps each term to the prefixes that it best describes 
+for term in ARGS.terms:
+    term_results: list[PrefixScore] = [] # A list that will hold the prefixes that this term best describes
+    terms_results[term] = term_results
+    
+    for prefix in PREFIXES:
+        prefix_score = PrefixScore(term, prefix)
+        # Only take into account prefixes with a score less than the length of the keyword
+        if prefix_score.score < len(term):
+            term_results.append(prefix_score)
+
+# Now that we have the prefixes for each term, perform
+# the appropriate filter according to the `all`
+# flag, and put the results in this list
+results: list[PrefixScore] = []
+
+# Case the user is looking for prefixes with ALL of the terms
+if ARGS.all:
+    # Get all the terms_results
+    values = list(terms_results.values())
+    # Put the first term_results in results
+    results = values[0]
+    # Then get its intersection with the remaining term_results
+    for term_results in values[1 :]:
+        results = PrefixScore.intersection(results, term_results)
+
+# Case the user is looking for prefixes with ANY of the terms
+else:
+    # Flatten the PrefixScore lists
+    prefixes_scores: list[PrefixScore] = [prefix_score
+                                            for term_results in terms_results.values()
+                                            for prefix_score in term_results]
+    # Pick unique Prefixes with lowest score
+    results = PrefixScore.pick_unique(prefixes_scores)
+
+# Finally, sort and show appropriate results
+MAX_RESULTS = 3 # How many results to show when uncertain
+results.sort(key= lambda prefix_score: prefix_score.score)
+# If no results were found
+if not results:
+    print(f"No relevant prefixes were found. Try more precise terms.")
+else:
+    # If we have a precise hit, show it
+    if results[0].score == 0:
+        print(f"{NL}{results[0].prefix.detailed_repr()}{NL}")
+    
+    # Otherwise, show #MAX_RESULTS top results
+    else:
+        print(f"Top results:{NL}")
+        for i, result in enumerate(results[: MAX_RESULTS]):
+            print(f"#{i +1} {result.prefix.detailed_repr()}{NL}")
+    
+    # Check if the user wants to copy top result
+    if not ARGS.no_copy:
+        prefix = Prefix.format_prefix(results[0].prefix.prefix)
+        if copy(prefix):
+            print(f"`{prefix}` was copied to the clipboard.")
+        else:
+            print(f"Unable to copy `{prefix}` to the clipboard.{NL}Please install the `pyperclip` module for this functionality.{NL}To do so simple run `python -m pip install pyperclip`")
