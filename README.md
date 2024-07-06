@@ -17,7 +17,7 @@ appropriate one to use. You could see a list of all the known prefixes and use t
 ```console
 $ pgt
 ```
-Or you could search for terms that describe your commit changes, for example:
+Or you could search for prefixes with terms that best describe your commit changes, for example:
 ```console
 $ pgt new feature
 ```
