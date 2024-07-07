@@ -27,24 +27,21 @@ class Prefix ():
         self.keywords = list(keywords) # The keywords are just as good as the prefix it self if you think about it
         self.keywords.insert(0, prefix)
     
-    @classmethod
-    def format_prefix (cls, prefix: str) -> str:
-        '''When ever the prefix is shown
-        or when its copied, show it in this
-        format.
-        It's useful for me because
-        I like my prefixes to be
-        in UPPERCASE. Maybe other
-        people like them some other way'''
-        return prefix.upper()
+    def formatted_prefix (self) -> str:
+        '''The prefix in the format it's shown in'''
+        return self.prefix.upper()
+    
+    def formatted_copy (self) -> str:
+        '''The prefix in the format it's copied in'''
+        return f"{self.prefix.upper()}: "
     
     def simple_repr (self) -> str:
         '''A simple representation of this prefix'''
-        return f"{Prefix.format_prefix(self.prefix)}: {self.description}"
+        return f"{self.formatted_prefix()}: {self.description}"
     
     def detailed_repr (self) -> str:
         '''A detailed representation of this prefix'''
-        repr = f"{Prefix.format_prefix(self.prefix)}: {self.description}{NL}"
+        repr = f"{self.formatted_prefix()}: {self.description}{NL}"
         repr += NL.join([f"\t-> {use_case}" for use_case in self.use_cases])
         return repr
 
@@ -143,7 +140,7 @@ PREFIXES = [
         'Purging redundant data',
         'Discarding unnecessary components'
     ], 'eliminate', 'discard', 'erase', 'purge',
-    'withdraw', 'uninstall', 'strip'),
+    'withdraw', 'uninstall', 'strip', 'delete'),
 
     Prefix('style', 'for code style changes', [
         'Formatting code',
@@ -161,9 +158,10 @@ PREFIXES = [
         'Build process changes',
         'Updating scripts',
         'Managing dependencies',
-        'Performing administrative tasks'
+        'Performing administrative tasks',
+        'Restructure file paths'
     ], 'routine', 'task', 'miscellaneous', 'manage',
-    'housekeeping', 'admin', 'upkeep'),
+    'housekeeping', 'admin', 'upkeep', 'move', 'relocate'),
 
     Prefix('update', 'for updating dependencies or other updates', [
         'Updating dependencies',
@@ -483,7 +481,7 @@ else:
     
     # Check if the user wants to copy top result
     if not ARGS.no_copy:
-        prefix = Prefix.format_prefix(results[0].prefix.prefix)
+        prefix = results[0].prefix.formatted_copy()
         if copy(prefix):
             print(f"`{prefix}` was copied to the clipboard.")
         else:
