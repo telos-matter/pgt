@@ -153,6 +153,7 @@ PREFIXES = [
     'arrange', 'layout'),
 
     Prefix('chore', 'for routine tasks, maintenance, or miscellaneous changes', [
+        'Remove unnecessary white lines / space',
         'Routine maintenance tasks',
         'Non-functional changes',
         'Build process changes',
@@ -161,7 +162,8 @@ PREFIXES = [
         'Performing administrative tasks',
         'Restructure file paths'
     ], 'routine', 'task', 'miscellaneous', 'manage',
-    'housekeeping', 'admin', 'upkeep', 'move', 'relocate'),
+    'housekeeping', 'admin', 'upkeep', 'move', 'relocate',
+    'space', 'whiteline'),
 
     Prefix('update', 'for updating dependencies or other updates', [
         'Updating dependencies',
